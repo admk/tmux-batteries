@@ -66,7 +66,7 @@ def braille_graph(l, **kwargs):
 
 
 def format_history(history):
-    braille_max = 4
+    braille_max = 3
     norm = lambda val, max_val: round(val / 100 * max_val)
     if use_braille:
         return braille_graph([norm(h, braille_max) for h in history])
