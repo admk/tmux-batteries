@@ -24,4 +24,5 @@ Install
 Screenshots
 -----------
 
-![GitHub Logo](/screenshots/1.png)
+![braille](/screenshots/2.png)
+![tmux](/screenshots/1.png)
