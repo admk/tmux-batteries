@@ -94,12 +94,21 @@ def split_string_in_portions(string, portions):
 
 def format_with_memory(string):
     stat = psutil.virtual_memory()
-    colors = ('red', 'yellow', 'blue', 'green', 'cyan')
-    portions = [stat.wired, stat.active, stat.inactive, stat.free]
-    try:
-        portions.append(stat.cached)
-    except AttributeError:
-        pass
+    keys = [
+        ('wired', 'red'),
+        ('active', 'yellow'),
+        ('inactive', 'blue'),
+        ('free', 'green'),
+        ('cached', 'cyan'),
+        ('buffers', 'magenta')]
+    portions = []
+    colors = []
+    for k, c in keys:
+        try:
+            portions.append(getattr(stat, k))
+            colors.append(c)
+        except AttributeError:
+            pass
     portions = split_string_in_portions(string, portions)
     portions = [colorize(s, c) for s, c in zip(portions, colors)]
     return ''.join(portions)
