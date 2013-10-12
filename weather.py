@@ -30,7 +30,7 @@ def pictograph(json_str, use_emoji):
     _pictograph_dict = {
         2: '☈⚡',           # thunderstorm
         3: '☂🌂',           # drizzle
-        4: '☔☔',           # rain
+        5: '☔☔',           # rain
         6: '❄⛄',           # snow
         7: '〰🌁',         # mist/smoke/haze/sand/fog
         8: '☁⛅',           # clouds
