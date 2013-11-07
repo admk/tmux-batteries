@@ -26,7 +26,7 @@ def cpu_history():
     try:
         with open(tmp_file, 'rb') as f:
             history = pickle.load(f)
-    except FileNotFoundError:
+    except (FileNotFoundError, EOFError):
         history = None
     if not history:
         history = [0] * length
