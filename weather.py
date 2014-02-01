@@ -19,7 +19,7 @@ def fetch(location, celcius=True):
     weather_url = \
         'http://api.openweathermap.org/data/2.5/weather?q=%s&units=%s' % \
         (location, unit)
-    response = urllib.request.urlopen(weather_url).read()
+    response = urllib.request.urlopen(weather_url, timeout=5).read()
     return json.loads(response.decode('utf-8'))
 
 
