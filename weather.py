@@ -8,7 +8,7 @@ import urllib.request
 import json
 
 
-location = 'London'
+location = 'London, GB'
 celcius = True
 precision = 1
 emoji = True
