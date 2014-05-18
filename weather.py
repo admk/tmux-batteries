@@ -13,6 +13,11 @@ celcius = True
 precision = 1
 emoji = True
 
+location = os.environ.get('WEATHER_LOCATION') or location
+celcius = os.environ.get('WEATHER_CELCIUS') or celcius
+precision = os.environ.get('WEATHER_PRECISION') or precision
+emoji = os.environ.get('WEATHER_EMOJI') or emoji
+
 
 def fetch(location, celcius=True):
     unit = 'metric' if celcius else 'imperial'
@@ -54,9 +59,6 @@ def temperature(json_str):
 
 
 def weather(location, celcius=True, precision=0):
-    location = os.environ.get('WEATHER_LOCATION') or location
-    celcius = os.environ.get('WEATHER_CELCIUS') or celcius
-    precision = os.environ.get('WEATHER_PRECISION') or precision
     json_str = fetch(location, celcius)
     unit = '℃' if celcius else '℉'
     use_emoji = emoji and sys.platform == 'darwin'
