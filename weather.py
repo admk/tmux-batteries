@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
-
-
-import os
+import json
 import sys
 import urllib.request
-import json
 
 
 location = 'London, GB'
@@ -13,17 +10,12 @@ celcius = True
 precision = 1
 emoji = True
 
-location = os.environ.get('WEATHER_LOCATION') or location
-celcius = os.environ.get('WEATHER_CELCIUS') or celcius
-precision = os.environ.get('WEATHER_PRECISION') or precision
-emoji = os.environ.get('WEATHER_EMOJI') or emoji
-
 
 def fetch(location, celcius=True):
     unit = 'metric' if celcius else 'imperial'
     weather_url = \
-        'http://api.openweathermap.org/data/2.5/weather?q=%s&units=%s' % \
-        (location, unit)
+        'http://api.openweathermap.org/data/2.5/weather?q={}&units={}'.format(
+            location, unit)
     response = urllib.request.urlopen(weather_url, timeout=5).read()
     return json.loads(response.decode('utf-8'))
 
@@ -54,17 +46,13 @@ def pictograph(json_str, use_emoji):
     return pict
 
 
-def temperature(json_str):
-    return json_str['main']['temp']
-
-
 def weather(location, celcius=True, precision=0):
     json_str = fetch(location, celcius)
     unit = '℃' if celcius else '℉'
     use_emoji = emoji and sys.platform == 'darwin'
     return '{pictograph}{temperature:.{precision}f}{unit}'.format(
         pictograph=pictograph(json_str, use_emoji), precision=precision,
-        temperature=temperature(json_str), unit=unit)
+        temperature=json_str['main']['temp'], unit=unit)
 
 
 if __name__ == '__main__':

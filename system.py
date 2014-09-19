@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
-"""This is an implementation of creaktive's rainbarf in Python 3. I did this
-because rainbarf is broken in Mavericks."""
-
-
 import pickle
 import sys
 from itertools import zip_longest
