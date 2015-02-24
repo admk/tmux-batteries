@@ -5,18 +5,29 @@ import sys
 import urllib.request
 
 
-location = 'London, GB'
+location = None
 celcius = True
 precision = 1
 emoji = True
+timeout = 5
 
 
-def fetch(location, celcius=True):
+def fetch_location():
+    url = 'http://www.telize.com/geoip'
+    response = urllib.request.urlopen(url, timeout=timeout).read()
+    geoip = json.loads(response.decode('utf-8'))
+    location = '{}, {}'.format(geoip['city'], geoip['country'])
+    return location
+
+
+def fetch(location=None, celcius=True):
     unit = 'metric' if celcius else 'imperial'
+    if not location:
+        location = fetch_location()
     weather_url = \
         'http://api.openweathermap.org/data/2.5/weather?q={}&units={}'.format(
             location, unit)
-    response = urllib.request.urlopen(weather_url, timeout=5).read()
+    response = urllib.request.urlopen(weather_url, timeout=timeout).read()
     return json.loads(response.decode('utf-8'))
 
 
@@ -38,7 +49,7 @@ def pictograph(json_str, use_emoji):
     code = json_str['weather'][0]['id']
     if code not in json_str:
         code = int(code / 100)
-    pict = _pictograph_dict[code][use_emoji]
+    pict = _pictograph_dict.get(code, '  ')[use_emoji]
     if len(pict) != 1:
         pict = pict[is_daytime()]
     if use_emoji:
