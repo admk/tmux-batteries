@@ -16,22 +16,22 @@ def fetch_location():
     url = 'http://www.telize.com/geoip'
     response = urllib.request.urlopen(url, timeout=timeout).read()
     geoip = json.loads(response.decode('utf-8'))
-    location = '{}, {}'.format(geoip['city'], geoip['country'])
-    return location
+    return geoip['latitude'], geoip['longitude']
 
 
 def fetch(location=None, celcius=True):
     unit = 'metric' if celcius else 'imperial'
     if not location:
-        location = fetch_location()
+        lat, lon = fetch_location()
+        location = 'lat={}&lon={}'.format(lat, lon)
     weather_url = \
-        'http://api.openweathermap.org/data/2.5/weather?q={}&units={}'.format(
+        'http://api.openweathermap.org/data/2.5/weather?{}&units={}'.format(
             location, unit)
     response = urllib.request.urlopen(weather_url, timeout=timeout).read()
     return json.loads(response.decode('utf-8'))
 
 
-def pictograph(json_str, use_emoji):
+def pictograph(json_data, use_emoji):
     def is_daytime():
         from datetime import datetime
         return 6 <= datetime.now().hour < 18
@@ -46,8 +46,8 @@ def pictograph(json_str, use_emoji):
         # specials
         800: ['☽☼', '🌜🌞']  # clear sky
     }
-    code = json_str['weather'][0]['id']
-    if code not in json_str:
+    code = json_data['weather'][0]['id']
+    if code not in json_data:
         code = int(code / 100)
     pict = _pictograph_dict.get(code, '  ')[use_emoji]
     if len(pict) != 1:
@@ -58,12 +58,12 @@ def pictograph(json_str, use_emoji):
 
 
 def weather(location, celcius=True, precision=0):
-    json_str = fetch(location, celcius)
+    json_data = fetch(location, celcius)
     unit = '℃' if celcius else '℉'
     use_emoji = emoji and sys.platform == 'darwin'
     return '{pictograph}{temperature:.{precision}f}{unit}'.format(
-        pictograph=pictograph(json_str, use_emoji), precision=precision,
-        temperature=json_str['main']['temp'], unit=unit)
+        pictograph=pictograph(json_data, use_emoji), precision=precision,
+        temperature=json_data['main']['temp'], unit=unit)
 
 
 if __name__ == '__main__':
