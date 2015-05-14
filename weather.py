@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- encoding: utf-8 -*-
+import pickle
 import json
 import sys
+import urllib
 import urllib.request
 
 
@@ -11,9 +13,11 @@ precision = 1
 emoji = True
 timeout = 5
 
+tmp_file = '/tmp/tmux_batteries_weather.pkl'
+
 
 def fetch_location():
-    url = 'http://www.telize.com/geoip'
+    url = 'https://freegeoip.net/json/'
     response = urllib.request.urlopen(url, timeout=timeout).read()
     geoip = json.loads(response.decode('utf-8'))
     return geoip['latitude'], geoip['longitude']
@@ -29,6 +33,17 @@ def fetch(location=None, celcius=True):
             location, unit)
     response = urllib.request.urlopen(weather_url, timeout=timeout).read()
     return json.loads(response.decode('utf-8'))
+
+
+def cached_fetch(location=None, celcius=True):
+    try:
+        json_data = fetch(location, celcius)
+        with open(tmp_file, 'wb') as f:
+            pickle.dump(json_data, f)
+        return json_data, False
+    except urllib.error.URLError:
+        with open(tmp_file, 'rb') as f:
+            return pickle.load(f), True
 
 
 def pictograph(json_data, use_emoji):
@@ -57,13 +72,14 @@ def pictograph(json_data, use_emoji):
     return pict
 
 
-def weather(location, celcius=True, precision=0):
-    json_data = fetch(location, celcius)
+def weather(location=None, celcius=True, precision=0):
+    json_data, is_cached = cached_fetch(location, celcius)
     unit = '℃' if celcius else '℉'
-    use_emoji = emoji and sys.platform == 'darwin'
-    return '{pictograph}{temperature:.{precision}f}{unit}'.format(
-        pictograph=pictograph(json_data, use_emoji), precision=precision,
-        temperature=json_data['main']['temp'], unit=unit)
+    temp = '{:.{prec}f}'.format(json_data['main']['temp'], prec=precision)
+    if is_cached:
+        temp = '~' + temp
+    pict = pictograph(json_data, emoji and sys.platform == 'darwin')
+    return '{pict}{temp}{unit}'.format(pict=pict, temp=temp, unit=unit)
 
 
 if __name__ == '__main__':

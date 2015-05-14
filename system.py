@@ -8,7 +8,7 @@ import psutil
 
 
 interval = 1
-history_length = 16
+history_length = 48
 invert_color = True
 use_braille = True
 
